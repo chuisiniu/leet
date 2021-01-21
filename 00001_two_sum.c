@@ -54,7 +54,7 @@ int *twoSum1(int *nums, int numsSize, int target, int *returnSize) {
     *returnSize = 0;
     result = malloc(sizeof(int) * 2);
     for (result[0] = 0; result[0] < numsSize; result[0]++) {
-        tmp = target - result[0];
+        tmp = target - nums[result[0]];
         for (result[1] = result[0] + 1; result[1] < numsSize; result[1]++) {
             if (nums[result[1]] == tmp) {
                 *returnSize = 2;

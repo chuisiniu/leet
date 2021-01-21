@@ -22,7 +22,7 @@ struct ListNode {
     struct ListNode *next;
 };
 
-struct ListNode *makeNewNode(int *inc, int num, ...) {
+static inline struct ListNode *makeNewNode(int *inc, int num, ...) {
     struct ListNode *result = malloc(sizeof(struct ListNode));
     va_list valist;
     int i;

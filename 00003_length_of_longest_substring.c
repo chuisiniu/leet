@@ -84,8 +84,36 @@ int lengthOfLongestSubstring1(char *s) {
     return max_length;
 }
 
-int main(int argc, char **argv) {
-    char *str = "pwwkew";
+int lengthOfLongestSubstring2(char *s) {
+    int position_of_char[128];
+    int cur;
+    int start;
+    int max_length = 0;
+    int tmp;
 
-    printf("%d\n", lengthOfLongestSubstring1(str));
+    bzero(position_of_char, sizeof(position_of_char));
+
+    for (start = 0, cur = 0; s[cur] != '\0'; cur++) {
+        if (position_of_char[s[cur]] >= start) {
+            tmp = cur - start;
+            if (tmp > max_length) {
+                max_length = tmp;
+            }
+            start = position_of_char[s[cur]] + 1;
+        }
+        position_of_char[s[cur]] = cur;
+    }
+
+    tmp = cur - start;
+    if (tmp > max_length) {
+        return tmp;
+    }
+
+    return max_length;
+}
+
+int main(int argc, char **argv) {
+    char *str = "au";
+
+    printf("%d\n", lengthOfLongestSubstring2(str));
 }
