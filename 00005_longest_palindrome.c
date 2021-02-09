@@ -57,7 +57,7 @@ char *longestPalindrome(char *s) {
             CHECK_LOOP(i, i + 1);
         }
 
-        if (str_len > 0 && max_len > (str_len / 2)) {
+        if (str_len > 0 && max_len / 2 > str_len - i) {
             break;
         }
     }
@@ -132,7 +132,6 @@ char *longestPalindrome2(char *s) {
     int max_ext;
     int max_pos;
     int pos;
-    int step;
     int left;
     int right;
 
@@ -140,6 +139,8 @@ char *longestPalindrome2(char *s) {
     for (origin_len = 0, tmp_len = 0; s[origin_len] != '\0';) {
         state[tmp_len] = 0;
         tmp[tmp_len++] = '#';
+
+        /* 字母两边是'#'所以起始的可扩展值是1 */
         state[tmp_len] = 1;
         tmp[tmp_len++] = s[origin_len++];
     }
@@ -162,19 +163,21 @@ char *longestPalindrome2(char *s) {
             }
         }
 
-        /* 回文中心是#的话每比较一个字符则可以多扩展两个位置 */
-        step = tmp[i] == '#' ? 2 : 1;
+        /* 没有必要比较'#'，所以步长是2 */
         for (k = state[i] + 1, left = i - k, right = i + k;
-             left >= 0 && right < tmp_len && tmp[left] == tmp[right];
-             state[i] += step, k = state[i] + 1, left = i - k, right = i + k);
+             left > -1 && right < tmp_len && tmp[left] == tmp[right];
+             state[i] += 2, k = state[i] + 1, left = i - k, right = i + k);
 
         if (--right > max_right) {
             max_right = right;
             center = i;
+            if (state[i] > max_ext) {
+                max_pos = ++left;
+                max_ext = state[i];
+            }
         }
-        if (state[i] > max_ext) {
-            max_pos = ++left;
-            max_ext = state[i];
+        if (max_ext > tmp_len - i) {
+            break;
         }
     }
 
@@ -185,9 +188,9 @@ char *longestPalindrome2(char *s) {
 }
 
 int main(int argc, char **argv) {
-    char s[] = "babadada";
+    char s[] = "gfgfgfg";
 
-    printf("%s\n", longestPalindrome2(s));
+    printf("%s\n", longestPalindrome(s));
 
     exit(0);
 }
