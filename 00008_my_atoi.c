@@ -106,3 +106,112 @@ int myAtoi(char *s) {
 
     return res * flag;
 }
+
+int myAtoi1(char *s) {
+    enum State {
+        START = 0,
+        SIGNED,
+        IN_NUMBER,
+        END,
+        STATE_MAX
+    };
+    enum Input {
+        SPACE = 0,
+        SIGN,
+        NUMBER,
+        OTHER,
+        INPUT_MAX
+    };
+    int table[STATE_MAX][INPUT_MAX] = {
+        [START]     = {
+            [SPACE]  = START,
+            [SIGN]   = SIGNED,
+            [NUMBER] = IN_NUMBER,
+            [OTHER]  = END,
+        },
+        [SIGNED]    = {
+            [SPACE]  = END,
+            [SIGN]   = END,
+            [NUMBER] = IN_NUMBER,
+            [OTHER]  = END,
+        },
+        [IN_NUMBER] = {
+            [SPACE]  = END,
+            [SIGN]   = END,
+            [NUMBER] = IN_NUMBER,
+            [OTHER]  = END,
+        },
+        [END]       = {
+            [SPACE]  = END,
+            [SIGN]   = END,
+            [NUMBER] = END,
+            [OTHER]  = END,
+        }
+    };
+    enum Input input;
+    enum State state = START;
+    char c;
+    int i = 0;
+
+    int result = 0;
+    int sign = 1;
+    int max = 0x7FFFFFFF;
+    int min = 0x80000000;
+    int m;
+    int n;
+
+    if (s[0] == 0) {
+        return 0;
+    }
+
+#define INPUT()                                 \
+    do {                                        \
+        c = s[i];                               \
+        if (c == ' ' || c == '\t')              \
+            input = SPACE;                      \
+        else if (c == '+' || c == '-')          \
+            input = SIGN;                       \
+        else if (c >= '0' && c <= '9')          \
+            input = NUMBER;                     \
+        else                                    \
+            input = OTHER;                      \
+        i++;                                    \
+    } while(0)
+
+#define UPDATE_STATE() \
+    do {               \
+        state = table[state][input];            \
+    } while(0)
+
+    m = max / 10;
+    n = max % 10;
+    do {
+        INPUT();
+        UPDATE_STATE();
+
+        switch (state) {
+        case START:
+            break;
+        case SIGNED:
+            if (c == '-') {
+                sign = -1;
+                m = -(min / 10);
+                n = -(min % 10);
+            }
+            break;
+        case IN_NUMBER:
+            if ((result == m && c - '0' >= n) || result > m) {
+                return sign == 1 ? max : min;
+            }
+            result *= 10;
+            result += c - '0';
+          break;
+        case END:
+            return result * sign;
+        default:
+            break;
+        }
+    } while (state != END);
+
+    return 0;
+}
