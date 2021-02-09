@@ -120,8 +120,8 @@ char *longestPalindrome1(char *s) {
 char *longestPalindrome2(char *s) {
     int origin_len;
     int tmp_len;
-    char tmp[2048];
-    int state[2048];
+    static char tmp[2048] = {0};
+    int state[2048] = {0};
 
     int center;
     int max_right;
@@ -136,19 +136,15 @@ char *longestPalindrome2(char *s) {
     int right;
 
     /* 把每个字符使用一个字符串中不存在的值包起来，消除回文中心是一个还是两个的问题 */
-    for (origin_len = 0, tmp_len = 0; s[origin_len] != '\0';) {
-        state[tmp_len] = 0;
-        tmp[tmp_len++] = '#';
-
+    for (origin_len = 0, tmp_len = 1; s[origin_len] != '\0';) {
         /* 字母两边是'#'所以起始的可扩展值是1 */
         state[tmp_len] = 1;
-        tmp[tmp_len++] = s[origin_len++];
+        tmp[tmp_len] = s[origin_len++];
+        tmp_len += 2;
     }
-    state[tmp_len] = 0;
-    tmp[tmp_len++] = '#';
-    tmp[tmp_len] = '\0';
 
-    for (i = 0, center = 0, max_right = 0, max_ext = 0; i < tmp_len; i++) {
+    for (i = 0, center = 0, max_right = 0, max_ext = 0;
+         i < tmp_len && max_ext < tmp_len - i; i++) {
         /* center为向右扩展最多的回文中心，mirror是i在回文中心左边对称的位置 */
         mirror = center - (i - center);
         if (i < max_right) {
@@ -163,7 +159,7 @@ char *longestPalindrome2(char *s) {
             }
         }
 
-        /* 没有必要比较'#'，所以步长是2 */
+        /* 没有必要比较包裹字符，所以步长是2 */
         for (k = state[i] + 1, left = i - k, right = i + k;
              left > -1 && right < tmp_len && tmp[left] == tmp[right];
              state[i] += 2, k = state[i] + 1, left = i - k, right = i + k);
@@ -175,9 +171,6 @@ char *longestPalindrome2(char *s) {
                 max_pos = ++left;
                 max_ext = state[i];
             }
-        }
-        if (max_ext > tmp_len - i) {
-            break;
         }
     }
 
