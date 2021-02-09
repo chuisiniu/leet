@@ -116,10 +116,78 @@ char *longestPalindrome1(char *s) {
     return s + max_i;
 }
 
+/* Manacher 算法 */
+char *longestPalindrome2(char *s) {
+    int origin_len;
+    int tmp_len;
+    char tmp[2048];
+    int state[2048];
+
+    int center;
+    int max_right;
+    int mirror;
+    int i;
+    int j;
+    int k;
+    int max_ext;
+    int max_pos;
+    int pos;
+    int step;
+    int left;
+    int right;
+
+    /* 把每个字符使用一个字符串中不存在的值包起来，消除回文中心是一个还是两个的问题 */
+    for (origin_len = 0, tmp_len = 0; s[origin_len] != '\0';) {
+        state[tmp_len] = 0;
+        tmp[tmp_len++] = '#';
+        state[tmp_len] = 1;
+        tmp[tmp_len++] = s[origin_len++];
+    }
+    state[tmp_len] = 0;
+    tmp[tmp_len++] = '#';
+    tmp[tmp_len] = '\0';
+
+    for (i = 0, center = 0, max_right = 0, max_ext = 0; i < tmp_len; i++) {
+        /* center为向右扩展最多的回文中心，mirror是i在回文中心左边对称的位置 */
+        mirror = center - (i - center);
+        if (i < max_right) {
+            /* i + state[mirror] 是如果i和mirror情况一样的话向右扩展的最大位置 */
+            if (i + state[mirror] < max_right) {
+                /* 最大位置在max_right以里，则最大扩展长度就是state[mirror] */
+                state[i] = state[mirror];
+                continue;
+            } else {
+                /* 否则i至少可以扩展到max_right - i */
+                state[i] = max_right - i;
+            }
+        }
+
+        /* 回文中心是#的话每比较一个字符则可以多扩展两个位置 */
+        step = tmp[i] == '#' ? 2 : 1;
+        for (k = state[i] + 1, left = i - k, right = i + k;
+             left >= 0 && right < tmp_len && tmp[left] == tmp[right];
+             state[i] += step, k = state[i] + 1, left = i - k, right = i + k);
+
+        if (--right > max_right) {
+            max_right = right;
+            center = i;
+        }
+        if (state[i] > max_ext) {
+            max_pos = ++left;
+            max_ext = state[i];
+        }
+    }
+
+    pos = max_pos / 2 + max_pos % 2;
+    s[pos + max_ext] = '\0';
+
+    return s + pos;
+}
+
 int main(int argc, char **argv) {
-  char s[] = "bacabab";
+    char s[] = "babadada";
 
-  printf("%s\n", longestPalindrome1(s));
+    printf("%s\n", longestPalindrome2(s));
 
-  exit(0);
+    exit(0);
 }
