@@ -93,7 +93,10 @@ int isMatch(char *s, char *p) {
 
     while (1) {
         next_char = p_position + 1;
+
+        // p_position后面的如a*b*c*连续*匹配压入栈
         while (p[p_position] != '\0' && p[next_char] == '*') {
+            // x***** 看作x*
             while (p[next_char + 1] == '*') {
                 next_char += 1;
             }
@@ -104,6 +107,8 @@ int isMatch(char *s, char *p) {
         }
 
         // printf("%s %s %d\n", s + s_position, p + p_position, ss.top + 1);
+
+        // 开始正常值的匹配
         if (s[s_position] == '\0' && p[p_position] == '\0') {
             return 1;
         }
@@ -115,12 +120,14 @@ int isMatch(char *s, char *p) {
             continue;
         }
 
+        // 正常值没匹配中且栈中没有*可以消耗字符
         if (stack_is_empty(&ss)) {
             return 0;
         }
 
         tmp = stack_pop(&ss);
         if (s[tmp->position_in_s + tmp->cost] == '\0') {
+            // 栈顶的*已经把s给消耗完了，出栈就行
             if (p[tmp->star_position + 1] == '\0') {
                 return 1;
             }
@@ -131,12 +138,14 @@ int isMatch(char *s, char *p) {
         p_position = tmp->star_position + 1;
         if (tmp->c == s[s_position] ||
             (s[s_position] != '\0' && tmp->c == '.')) {
+            // 栈顶的*可以消耗一个字符，则多消耗一个字符，重新入栈
             stack_push(&ss, tmp->c, tmp->position_in_s, tmp->star_position,
                        tmp->cost + 1);
             s_position += 1;
         } else if (stack_is_empty(&ss)) {
             break;
         } else {
+            // 栈顶*无法消耗字符，则出栈，且把之前消耗的字符恢复回去
             s_position = tmp->position_in_s;
         }
     }
