@@ -153,15 +153,44 @@ int isMatch(char *s, char *p) {
     return s[s_position] == '\0' && p[p_position] == '\0';
 }
 
+int isMatch1(char *s, char *p) {
+    int i;
+    int match;
+
+    if ('\0' == s[0] && '\0' == p[0]) {
+        return 1;
+    }
+
+    if (p[0] == '\0') {
+        return 0;
+    }
+
+    if (p[1] == '*') {
+        i = -1;
+        do {
+            i++;
+            if (isMatch1(s + i, p + 2)) {
+                return 1;
+            }
+        } while(s[i] == p[0] || (s[i] != '\0' && p[0] == '.'));
+    }
+
+    if (s[0] == p[0] || (p[0] == '.' && s[0] != '\0')) {
+        return isMatch1(s + 1, p + 1);
+    }
+
+    return 0;
+}
+
 int main(int argc, char **argv) {
-    printf("0 %d\n", isMatch("ab", ".*c"));
-    printf("1 %d\n", isMatch("aab", "c*a*b"));
-    printf("1 %d\n", isMatch("ab", ".*"));
-    printf("0 %d\n", isMatch("a", ".*..a*"));
-    printf("1 %d\n", isMatch("", ".*"));
-    printf("0 %d\n", isMatch("b", "c*bb"));
-    printf("0 %d\n", isMatch("ccbbabbbabababa", ".*.ba*c*c*aab.a*b*"));
-    printf("1 %d\n", isMatch("aaa", "ab*a*c*a"));
+    printf("0 %d\n", isMatch1("ab", ".*c"));
+    printf("1 %d\n", isMatch1("aab", "c*a*b"));
+    printf("1 %d\n", isMatch1("ab", ".*"));
+    printf("0 %d\n", isMatch1("a", ".*..a*"));
+    printf("1 %d\n", isMatch1("", ".*"));
+    printf("0 %d\n", isMatch1("b", "c*bb"));
+    printf("0 %d\n", isMatch1("ccbbabbbabababa", ".*.ba*c*c*aab.a*b*"));
+    printf("1 %d\n", isMatch1("aaa", "ab*a*c*a"));
 
   exit(0);
 }
