@@ -22,9 +22,7 @@
  */
 
 int isPalindrome(int x) {
-    int reverse;
-    int got;
-    int remain;
+    int reverse = 0;
 
     if (x < 0 || (x % 10 == 0 && x != 0)) {
         return 0;
@@ -33,19 +31,10 @@ int isPalindrome(int x) {
         return 1;
     }
 
-    remain = x;
-    reverse = 0;
-    while (remain > reverse) {
-        got = remain % 10;
-        remain = remain / 10;
-        if (remain == reverse) {
-            return 1;
-        }
-        reverse = reverse * 10 + got;
-        if (remain == reverse) {
-            return 1;
-        }
+    while (x > reverse) {
+        reverse = reverse * 10 + x % 10;
+        x = x / 10;
     }
 
-    return 0;
+    return reverse == x || (reverse / 10 == x);
 }
