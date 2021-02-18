@@ -182,15 +182,65 @@ int isMatch1(char *s, char *p) {
     return 0;
 }
 
-int main(int argc, char **argv) {
-    printf("0 %d\n", isMatch1("ab", ".*c"));
-    printf("1 %d\n", isMatch1("aab", "c*a*b"));
-    printf("1 %d\n", isMatch1("ab", ".*"));
-    printf("0 %d\n", isMatch1("a", ".*..a*"));
-    printf("1 %d\n", isMatch1("", ".*"));
-    printf("0 %d\n", isMatch1("b", "c*bb"));
-    printf("0 %d\n", isMatch1("ccbbabbbabababa", ".*.ba*c*c*aab.a*b*"));
-    printf("1 %d\n", isMatch1("aaa", "ab*a*c*a"));
+#define MAX_STR_LEN 48
 
-  exit(0);
+int isMatch2(char *s, char *p) {
+    int state_array[MAX_STR_LEN][MAX_STR_LEN];
+    int i;
+    int j;
+    int k;
+
+    // printf("%s\n%s\n", s, p);
+
+    if (p[0] == '\0') {
+        return s[0] == '\0';
+    }
+
+    /* state_array[i][j] 表示s的前i个元素和p的前j个元素匹配 */
+    for (i = 0; i < MAX_STR_LEN; i++) {
+        for (j = 0; j < MAX_STR_LEN; j++) {
+            state_array[i][j] = 0;
+        }
+    }
+    state_array[0][0] = 1;
+
+    for (i = 0; i== 0 || s[i - 1] != '\0'; i++) {
+        for (j = 1; p[j - 1] != '\0'; j++) {
+            if (p[j - 1] == '*') {
+                if (i > 0 && (s[i - 1] == p[j - 2] || p[j - 2] == '.')) {
+                    state_array[i][j] = state_array[i][j - 2]
+                        || state_array[i - 1][j - 2] || state_array[i - 1][j];
+                } else {
+                    state_array[i][j] = state_array[i][j - 2];
+                }
+            } else {
+                if (i > 0 && (s[i - 1] == p[j - 1] || p[j - 1] == '.')) {
+                    state_array[i][j] = state_array[i - 1][j - 1];
+                }
+            }
+            // printf("%d %d %d\n", i, j, state_array[i][j]);
+        }
+    }
+
+    return state_array[i - 1][j - 1];
+}
+
+int main(int argc, char **argv) {
+    printf("0 %d\n", isMatch2("ab", ".*c"));
+    printf("1 %d\n", isMatch2("aab", "c*a*b"));
+    printf("1 %d\n", isMatch2("ab", ".*"));
+    printf("0 %d\n", isMatch2("a", ".*..a*"));
+    printf("1 %d\n", isMatch2("", ".*"));
+    printf("0 %d\n", isMatch2("b", "c*bb"));
+    printf("0 %d\n", isMatch2("ccbbabbbabababa", ".*.ba*c*c*aab.a*b*"));
+    printf("1 %d\n", isMatch2("aaa", "ab*a*c*a"));
+    printf("0 %d\n", isMatch2("aa", "a"));
+    printf("1 %d\n", isMatch2("mississippi", "mis*is*ip*."));
+    printf("1 %d\n", isMatch2("ab", ".*.."));
+    printf("0 %d\n", isMatch2("a", "ab*a"));
+    printf("1 %d\n", isMatch2("", ".*"));
+    printf("0 %d\n", isMatch2("a", ""));
+    printf("0 %d\n", isMatch2("aab", "b.*"));
+    printf("0 %d\n", isMatch2("abb", "b*"));
+    exit(0);
 }
