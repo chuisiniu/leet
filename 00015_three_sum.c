@@ -31,8 +31,6 @@ void print(int *nums, int numsSize) {
     printf("\n");
 }
 
-#define MAX_NUMS_SIZE 4096
-
 void quick_sort(int *nums, int numsSize) {
     int flag;
     int i;
